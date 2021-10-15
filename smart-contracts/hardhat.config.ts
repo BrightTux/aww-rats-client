@@ -194,6 +194,22 @@ task('update-cost', 'Update the cost of minting a token in ether')
     }
   });
 
+  task('update-supply', 'Update the maximum number of tokens available')
+  .addPositionalParam('tokens', 'The new number of max tokens', 990, types.int)
+  .setAction(async ({ tokens }, hre) => {
+    try {
+      const [signer] = await hre.ethers.getSigners();
+      const Rat = await hre.ethers.getContractFactory('Rat', signer);
+      const rat = Rat.attach(CONTRACT_ADDRESS ?? '');
+      const tx = await rat
+        .setMaxTokens(tokens)
+        .then((t) => t.wait());
+      console.log('Transaction Hash:', tx.transactionHash);
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
 task('regenerate-rat', "Regenerate a Rat that doesn't have metadata")
   .addPositionalParam('id', 'Token ID to update', 0, types.int)
   .setAction(async ({ id }, hre) => {
